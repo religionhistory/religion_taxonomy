@@ -665,7 +665,7 @@ make_nexus_dict <- function(raw_data, analysis, granularity, var_filter, entry_f
 }
 
 # Create dictionary of IDs and metadata
-id_metadata_dictionary <- function(data, raw_data, phylogeny) {
+id_metadata_dictionary <- function(data, raw_data, taxonomy) {
   dictionary <- data %>%
     left_join(select(raw_data, c(`Entry ID`, `Entry name`, `Entry source`, `Entry description`, `Entry tags`, `Date range`, `Region ID`, `Region name`, `Region description`, `Region tags`, Expert))) %>%
     distinct() %>%
@@ -715,7 +715,7 @@ id_metadata_dictionary <- function(data, raw_data, phylogeny) {
     mutate(non_elite = ifelse(grepl("N", `Branching question`), "N", NA)) %>%
     mutate(religious_specialist = ifelse(grepl("R", `Branching question`), "R", NA)) %>%
     # Add tip labels
-    mutate(label = phylogeny$tip.label) %>%
+    mutate(label = taxonomy$tip.label) %>%
     select(label, everything())
 }
 
@@ -727,21 +727,21 @@ heatmap_formatting <- function(data) {
   data <- data %>% select(-ID)
 }
 
-# Extract phylogeny edge lengths
-phylo_edge_length <- function(data){
+# Extract taxonomy edge lengths
+taxonomy_edge_length <- function(data){
   data <- data.frame(data$edge, edge_length=round(data$edge.length,2)) %>% 
     rename("parent" = "X1", "node" = "X2")
 }
 
-# Plot phylogeny with edge lengths
-plot_phylo_edge <- function(phylogeny, phylogeny_edges){
-  tree <- ggtree(phylogeny) %<+% phylogeny_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2) 
+# Plot taxonomy with edge lengths
+plot_taxonomy_edge <- function(taxonomy, taxonomy_edges){
+  tree <- ggtree(taxonomy) %<+% taxonomy_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2) 
 }
 
-# Plot phylogeny with entry/group of people labels
-plot_phylo_group <- function(phylogeny, phylogeny_edges, dictionary){
+# Plot taxonomy with entry/group of people labels
+plot_taxonomy_group <- function(taxonomy, taxonomy_edges, dictionary){
   # Add edge lengths
-  tree <- plot_phylo_edge(phylogeny, phylogeny_edges)
+  tree <- plot_taxonomy_edge(taxonomy, taxonomy_edges)
   # Add tiplabels and circles indicating which group of people(s) entry covers
   tree2 <- tree %<+% dictionary +
     geom_tiplab(aes(label = `Entry name`), size=2.5, offset=0.255) +
@@ -856,9 +856,9 @@ col_row_names <- function(x,y) {
 }
 
 # Compare expert and data derived tagging trees
-tree_compare <- function(data, id_dictionary, phylogeny, output){
+tree_compare <- function(data, id_dictionary, taxonomy, output){
   # Combine dictionary with metadata
-  dictionary <- id_metadata_dictionary(id_dictionary, drh, phylogeny)
+  dictionary <- id_metadata_dictionary(id_dictionary, drh, taxonomy)
   # Find tag levels and frequency of tags per religious group
   tags <- tag_level_freq(dictionary)
   # Merge question and answer data with metadata
@@ -936,10 +936,10 @@ tree_compare <- function(data, id_dictionary, phylogeny, output){
   row.names(tag_tree_longest) <- colnames(tag_tree_longest)
   
   # Create distance matrix of branch lengths
-  branch_length <- cophenetic(phylogeny)
+  branch_length <- cophenetic(taxonomy)
   
   # Create distance matrix of the number of nodes between taxa
-  n_node <- as.matrix(distTips(phylogeny, tips = "all", method = "nNodes", useC = TRUE))
+  n_node <- as.matrix(distTips(taxonomy, tips = "all", method = "nNodes", useC = TRUE))
   
   # Find the highest (furthest from root tag level per taxa)
   max_tag_level <- tags %>%

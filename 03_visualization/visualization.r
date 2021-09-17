@@ -18,11 +18,11 @@ data <- heatmap_formatting(data)
 
 # Extract metadata for plotting
 # Extract edge lengths
-taxonomy_edges <- phylo_edge_length(taxonomy)
+taxonomy_edges <- taxonomy_edge_length(taxonomy)
 
 # Plot tree with heatmap of answers
 # Plot tree with branch lengths, tip labels and circles indicating which group of people(s) entry covers
-taxonomy_group <- plot_phylo_group(taxonomy, taxonomy_edges, dictionary)
+taxonomy_group <- plot_taxonomy_group(taxonomy, taxonomy_edges, dictionary)
 # Add heatmap of answers
 tree_heatmap <- gheatmap(taxonomy_group, data, offset=0.012, width=0.42, colnames = FALSE, font.size=2) +
   scale_fill_manual(values = c("#91bfdb", "#fc8d59", "#ffffbf"), breaks=c("1", "0", "{01}"), labels = c("Yes", "No", "Uncertainty (Yes or No)")) +
@@ -55,7 +55,7 @@ religion_tags <- dictionary %>%
 
 # Plot tree with religious group tip labels
 # Plot branch length labels
-tree_edge <- plot_phylo_edge(taxonomy, taxonomy_edges)
+tree_edge <- plot_taxonomy_edge(taxonomy, taxonomy_edges)
 # Add tip labels
 tree_religious_group <- tree_edge %<+% religion_tags +
   geom_tiplab(aes(label = entry_tags), size=2, offset=0.01) +
