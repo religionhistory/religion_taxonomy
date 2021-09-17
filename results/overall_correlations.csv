@@ -1,0 +1,12 @@
+Comparison,z,p-value,tau,Sig
+"Shortest vs Longest
+Distance Tagging Tree",125.09,0,0.59,*
+"Branch Length vs Shortest
+Distance Tagging Tree",35.55,8.179999999999996e-277,0.17,*
+"nNode vs Shortest Distance
+Tagging Tree",16.58,9.429999999999999e-62,0.07,*
+"Branch Length vs Longest
+Distance Tagging Tree",20.69,4.589999999999999e-95,0.1,*
+"nNode vs Longest Distance
+Tagging Tree",2.01,0.0446,0.01,
+Branch Length vs nNode,105.72,0,0.47,*

@@ -986,4 +986,75 @@ tree_compare <- function(data, id_dictionary, taxonomy, output){
   names(cor_list) <- c("taxa_correlations", "whole_matrix_correlations", "taxa_tag_level_correlations")
   # Save output
   list.save(cor_list, paste0("./output/", output, "_cor.rds"))
-  }
+}
+
+# Extract Kendall's rank correlation tau test output
+kendall_output <- function(data){
+  z = data$whole_matrix_correlations$shortest_vs_longest_distance_tag_tree$statistic
+  p_value = data$whole_matrix_correlations$shortest_vs_longest_distance_tag_tree$p.value
+  tau = data$whole_matrix_correlations$shortest_vs_longest_distance_tag_tree$estimate
+  s_v_l = data.frame(Comparison = "Shortest vs Longest\nDistance Tagging Tree", z = z, "p-value" = p_value, tau = tau, check.names = FALSE)
+  z = data$whole_matrix_correlations$branch_length_short_tag_tree$statistic
+  p_value = data$whole_matrix_correlations$branch_length_short_tag_tree$p.value
+  tau = data$whole_matrix_correlations$branch_length_short_tag_tree$estimate
+  b_v_s = data.frame(Comparison = "Branch Length vs Shortest\nDistance Tagging Tree", z = z, "p-value" = p_value, tau = tau, check.names = FALSE)
+  z = data$whole_matrix_correlations$n_node_short_tag_tree$statistic
+  p_value = data$whole_matrix_correlations$n_node_short_tag_tree$p.value
+  tau = data$whole_matrix_correlations$n_node_short_tag_tree$estimate
+  n_v_s = data.frame(Comparison = "nNode vs Shortest Distance\nTagging Tree", z = z, "p-value" = p_value, tau = tau, check.names = FALSE)
+  z = data$whole_matrix_correlations$branch_length_long_tag_tree$statistic
+  p_value = data$whole_matrix_correlations$branch_length_long_tag_tree$p.value
+  tau = data$whole_matrix_correlations$branch_length_long_tag_tree$estimate
+  b_v_l = data.frame(Comparison = "Branch Length vs Longest\nDistance Tagging Tree", z = z, "p-value" = p_value, tau = tau, check.names = FALSE)
+  z = data$whole_matrix_correlations$n_node_tag_long_tree$statistic
+  p_value = data$whole_matrix_correlations$n_node_tag_long_tree$p.value
+  tau = data$whole_matrix_correlations$n_node_tag_long_tree$estimate
+  n_v_l = data.frame(Comparison = "nNode vs Longest Distance\nTagging Tree", z = z, "p-value" = p_value, tau = tau, check.names = FALSE)
+  z = data$whole_matrix_correlations$branch_length_n_node$statistic
+  p_value = data$whole_matrix_correlations$branch_length_n_node$p.value
+  tau = data$whole_matrix_correlations$branch_length_n_node$estimate
+  b_v_n = data.frame(Comparison = "Branch Length vs nNode", z = z, "p-value" = p_value, tau = tau, check.names = FALSE)
+  output = rbind(s_v_l, b_v_s, n_v_s, b_v_l, n_v_l, b_v_n) %>%
+    mutate(z = round(z, 2), `p-value` = signif(`p-value`, 3), tau = round(tau, 2)) %>%
+    mutate(Sig = if_else(`p-value` < 0.005, "*", "") )
+}
+
+# Find the correlation between clusters by comparison of interest
+cluster_cor <- function(correlations, clusters, comparison) {
+  # Extract diagonals
+  diagonal <- lapply(correlations$taxa_correlations, diag)
+  
+  # Join diagonals with metadata
+  data <- clusters %>%
+    mutate(shortest_vs_longest_distance_tag_tree = diagonal$shortest_vs_longest_distance_tag_tree, branch_length_short_tag_tree = diagonal$branch_length_short_tag_tree, n_node_short_tag_tree = diagonal$n_node_short_tag_tree, branch_length_long_tag_tree = diagonal$branch_length_long_tag_tree, n_node_tag_long_tree = diagonal$n_node_tag_long_tree, branch_length_n_node = diagonal$branch_length_n_node) %>%
+    mutate(Cluster = as.factor(Cluster), `Entry name` = as.factor(`Entry name`), ID = as.factor(ID)) %>%
+    rowid_to_column("row_no")
+  
+  # Extract comparison of interest
+  comparison_mtx <- correlations$taxa_correlations[[comparison]]
+  
+  # Convert to pairwise list
+  comparison_df <- t(combn(colnames(comparison_mtx), 2))
+  comparison_df <- data.frame(comparison_df, cor=comparison_mtx[comparison_df])
+  
+  # Add matched entries 
+  data_sub <- data %>%
+    select(ID, all_of(comparison)) %>%
+    mutate(X2 = ID) %>%
+    rename(X1 = ID, cor = all_of(comparison)) %>%
+    select(X1, X2, cor) 
+  comparison_df <- rbind(comparison_df, data_sub) %>%
+    distinct()
+  
+  # Join with metadata
+  comparison_meta <- comparison_df %>%
+    rename("ID" = X1) %>%
+    left_join(select(clusters, Cluster, ID, `Entry name`, `Entry ID`, `Entry tags`)) %>%
+    rename(ID1 = ID) %>%
+    rename("ID" = X2, "Cluster1" = Cluster, `Entry name1` = `Entry name`, `Entry ID1` = `Entry ID`, `Entry tags1` = `Entry tags`) %>%
+    left_join(select(clusters, Cluster, ID, `Entry name`, `Entry ID`, `Entry tags`)) %>%
+    mutate(match_cluster = Cluster1 == Cluster) %>%
+    filter(match_cluster == TRUE) %>%
+    rename(ID2 = ID, `Entry name2` = `Entry name`, `Entry ID2` = `Entry ID`, `Entry tags2` = `Entry tags`) %>%
+    select(-match_cluster, -Cluster1)
+}
