@@ -28,10 +28,10 @@ source("tree_comparison.r")
 setwd("..")
 
 # Compare correlation within clusters
-make.dir("./06_cluster_comparison/input")
+make.dir("./06_cluster_correlation/input")
 files <- c("./04_tree_comparison/output/b_f_con_50_50_cor.rds", "./data/clusters/b_f_con_50_50.csv")
-file.copy(files, "./06_cluster_comparison/input", overwrite = TRUE)
-setwd("./06_cluster_comparison/")
-source("cluster_comparison.r")
+file.copy(files, "./06_cluster_correlation/input", overwrite = TRUE)
+setwd("./06_cluster_correlation/")
+source("cluster_correlation.r")
 setwd("..")
 
