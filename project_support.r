@@ -3,7 +3,11 @@ packages <- c("tidyverse", "data.table", "ape", "igraph", "adephylo", "h2o", "rl
 install.packages(setdiff(packages, rownames(installed.packages())))
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
-BiocManager::install(setdiff("ggtree", rownames(installed.packages())))
+bioc_packages <- "ggtree"
+bioc_missing <- setdiff("ggtree", rownames(installed.packages())) 
+if( length(bioc_missing) ) {
+  biocLite(bioc_packages[bioc_missing])
+}
 
 # Load packages
 library(tidyverse)
@@ -24,7 +28,7 @@ make.dir <- function(fp) {
     make.dir(dirname(fp))
     dir.create(fp)
   } else {   # If it existed, delete and replace with a new one  
-    unlink(fp, recursive = TRUE)
+    unlink(fp, recursive = FALSE)
     dir.create(fp)
   }
 } 
