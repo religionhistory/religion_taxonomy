@@ -1,6 +1,9 @@
 # Check if packages are installed and if they are not installed, install them
-packages <- c("tidyverse", "data.table", "ape", "igraph", "adephylo", "ggtree", "h2o", "rlist")
+packages <- c("tidyverse", "data.table", "ape", "igraph", "adephylo", "h2o", "rlist")
 install.packages(setdiff(packages, rownames(installed.packages())))
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install(setdiff("ggtree", rownames(installed.packages())))
 
 # Load packages
 library(tidyverse)
