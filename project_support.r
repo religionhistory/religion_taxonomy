@@ -676,6 +676,10 @@ id_metadata_dictionary <- function(data, raw_data, phylogeny) {
     summarise(Expert = paste(unique(Expert), collapse = ", ")) %>% 
     ungroup() %>%
     mutate(Expert = if_else(Expert == "William Noseworthy, Andrea Acri", "Andrea Acri, William Noseworthy", Expert)) %>%
+    mutate(Expert = if_else(Expert == "Ann Taves" & `Entry ID` == "967", "Courtney Applewhite, Ann Taves", Expert)) %>%
+    mutate(Expert = if_else(Expert == "Courtney Applewhite", "Courtney Applewhite, Ann Taves", Expert)) %>%
+    mutate(Expert = if_else(Expert == "Ann Taves" & `Entry ID` == "486", "Kevin Pepper, Ann Taves", Expert)) %>%
+    mutate(Expert = if_else(Expert == "Kevin Pepper" & `Entry ID` == "486", "Kevin Pepper, Ann Taves", Expert)) %>%
     # Convert date ranges to numeric
     mutate(start_date = str_extract(`Date range`, "[^-]+")) %>%
     mutate(start_year = as.numeric(gsub("([0-9]+).*$", "\\1", start_date))) %>%
@@ -696,7 +700,17 @@ id_metadata_dictionary <- function(data, raw_data, phylogeny) {
     summarise(`Region ID` = paste(unique(`Region ID`), collapse = ", "), `Region name` = paste(unique(`Region name`), collapse = "; "), `Region description` = paste(unique(`Region description`), collapse = "; "), `Region tags` = paste(unique(`Region tags`), collapse = "; ")) %>% 
     ungroup() %>%
     distinct() %>%
-    # Split groups of people into seperate columns for plotting
+    # Combine multiple regions into single strings for Region ID, Region name, Region description and Region tags, selecting earliest and latest finishing date
+    group_by_at(vars(-`Start year`, -`End year`, -`Region ID`, -`Region name`, -`Region description`, -`Region tags`)) %>%
+    mutate(`Start year` = min(`Start year`)) %>%
+    mutate(`End year` = max(`End year`)) %>%
+    ungroup() %>%
+    distinct() %>%
+    group_by_at(vars(-`Region ID`, -`Region name`, -`Region description`, -`Region tags`)) %>%
+    summarise(`Region ID` = paste(unique(`Region ID`), collapse = ", "), `Region name` = paste(unique(`Region name`), collapse = "; "), `Region description` = paste(unique(`Region description`), collapse = "; "), `Region tags` = paste(unique(`Region tags`), collapse = "; ")) %>% 
+    ungroup() %>%
+    distinct() %>%
+    # Split groups of people into separate columns for plotting
     mutate(elite = ifelse(grepl("E", `Branching question`), "E", NA)) %>%
     mutate(non_elite = ifelse(grepl("N", `Branching question`), "N", NA)) %>%
     mutate(religious_specialist = ifelse(grepl("R", `Branching question`), "R", NA)) %>%

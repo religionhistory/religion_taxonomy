@@ -3,6 +3,9 @@ rm(list = ls())
 # Load packages and functions
 source("./project_support.r")
 
+# Make figures folder
+make.dir("figures")
+
 # Visualize phylogeny
 make.dir("./03_visualization/input")
 files <- c("./02_make_nexus/output/b_f_con_data_50_50.csv", "./02_make_nexus/output/b_f_con_ID_dict_50_50.csv", "./data/drh.csv", "./data/BEAST2/con/b_f_con_50_50_mcct.tree")

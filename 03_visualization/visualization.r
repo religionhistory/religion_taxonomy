@@ -8,28 +8,28 @@ source("../project_support.r")
 data <- read_csv("./input/b_f_con_data_50_50.csv")
 id_dictionary <- read_csv("./input/b_f_con_ID_dict_50_50.csv")
 raw_data <- read_csv("./input/drh.csv")
-phylogeny <- read.nexus(file = "./input/b_f_con_50_50_mcct.tree")
+taxonomy <- read.nexus(file = "./input/b_f_con_50_50_mcct.tree")
 
 # Combine dictionary with metadata
-dictionary <- id_metadata_dictionary(id_dictionary, raw_data, phylogeny)
+dictionary <- id_metadata_dictionary(id_dictionary, raw_data, taxonomy)
 
 # Format data for heatmap
 data <- heatmap_formatting(data)
 
 # Extract metadata for plotting
 # Extract edge lengths
-phylogeny_edges <- phylo_edge_length(phylogeny)
+taxonomy_edges <- phylo_edge_length(taxonomy)
 
 # Plot tree with heatmap of answers
 # Plot tree with branch lengths, tip labels and circles indicating which group of people(s) entry covers
-phylo_group <- plot_phylo_group(phylogeny, phylogeny_edges, dictionary)
+taxonomy_group <- plot_phylo_group(taxonomy, taxonomy_edges, dictionary)
 # Add heatmap of answers
-phylo_heatmap <- gheatmap(phylo_group, data, offset=0.012, width=0.42, colnames = FALSE, font.size=2) +
+tree_heatmap <- gheatmap(taxonomy_group, data, offset=0.012, width=0.42, colnames = FALSE, font.size=2) +
   scale_fill_manual(values = c("#91bfdb", "#fc8d59", "#ffffbf"), breaks=c("1", "0", "{01}"), labels = c("Yes", "No", "Uncertainty (Yes or No)")) +
     guides(fill = guide_legend(title="Value")) 
 # Save plot
 pdf("../figures/heatmap_tree.pdf", height = 15, width = 20)
-plot(phylo_heatmap)
+plot(tree_heatmap)
 dev.off()
 
 # Split religious group tags into separate columns
@@ -50,28 +50,28 @@ religion_tags <- dictionary %>%
   mutate(entry_tags = gsub("NA", "", entry_tags)) %>%
   mutate(entry_tags = gsub(" ,", "", entry_tags)) %>%
   mutate(entry_tags = gsub("  ", " ", entry_tags)) %>%
-  # Remove tag numbers for visualisation
+  # Remove tag numbers for visualization
   mutate(entry_tags = gsub("\\[[0-9]+\\]", "", entry_tags))
 
 # Plot tree with religious group tip labels
 # Plot branch length labels
-phylo_edge <- plot_phylo_edge(phylogeny, phylogeny_edges)
+tree_edge <- plot_phylo_edge(taxonomy, taxonomy_edges)
 # Add tip labels
-phylo_religious_group <- phylo_edge %<+% religion_tags +
+tree_religious_group <- tree_edge %<+% religion_tags +
   geom_tiplab(aes(label = entry_tags), size=2, offset=0.01) +
   xlim(0, 1)
 # save plot
 pdf("../figures/religious_group_tree.pdf", height = 15, width = 22)
-plot(phylo_religious_group)
+plot(tree_religious_group)
 dev.off()
 
 # Plot tree with expert tip labels
-phylo_expert <- phylo_edge %<+% dictionary +
+tree_expert <- tree_edge %<+% dictionary +
   geom_tiplab(aes(label = Expert), size=3, offset=0.01) +
   xlim(0, 1)
 # save plot
 pdf("../figures/expert_tree.pdf", height = 15, width = 20)
-plot(phylo_expert)
+plot(tree_expert)
 dev.off()
 
 # Split region tags into separate columns
@@ -92,23 +92,23 @@ region_tags <- dictionary %>%
   mutate(region_tags = gsub("NA", "", region_tags)) %>%
   mutate(region_tags = gsub(" ,", "", region_tags)) %>%
   mutate(region_tags = gsub("  ", " ", region_tags)) %>%
-  # Remove tag numbers for visualisation
+  # Remove tag numbers for visualization
   mutate(region_tags = gsub("\\[[0-9]+\\]", "", region_tags))
 
 # Plot tree with region tip labels
-phylo_region <- phylo_edge %<+% region_tags +
+tree_region <- tree_edge %<+% region_tags +
   geom_tiplab(aes(label = region_tags), size=3, offset=0.01) +
   xlim(0, 1)
 # save plot
 pdf("../figures/region_tree.pdf", height = 15, width = 22)
-plot(phylo_region)
+plot(tree_region)
 dev.off()
 
 # Plot tree with entry source tip labels
-phylo_source <- phylo_edge %<+% dictionary +
+tree_source <- tree_edge %<+% dictionary +
   geom_tiplab(aes(label = `Entry source`), size=3, offset=0.01) +
   xlim(0, 1)
 # save plot
 pdf("../figures/source_tree.pdf", height = 15, width = 22)
-plot(phylo_source)
+plot(tree_source)
 dev.off()
