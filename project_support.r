@@ -1073,6 +1073,42 @@ tree_compare <- function(data, id_dictionary, taxonomy, output){
   list.save(cor_list, paste0("./output/", output, "_cor.rds"))
 }
 
+# Find distinguishing questions between clusters
+compare_clusters <- function(data, cluster1, cluster2, name_cluster1, name_cluster2) {
+  clusters <- metadata %>% 
+    mutate(Cluster = case_when(Cluster %in% cluster1 ~ name_cluster1,
+                               Cluster %in% cluster2 ~ name_cluster2)) %>%
+    filter(!is.na(Cluster)) %>%
+    mutate(Cluster = as.factor(as.character(Cluster))) %>%
+    select(-ID, -`Entry ID`, -`Branching question`, -`Entry name`, -`Entry source`, -`Entry description`, -`Entry tags`, -Expert, -`Region ID`, -`Region name`, -`Region description`, -`Region tags`, -elite, -non_elite, -religious_specialist) %>%
+    mutate_all(as.character) %>%
+    pivot_longer(c(-Cluster), names_to = "Question", values_to = "Answers") %>%
+    group_by(Cluster, Question, Answers) %>%
+    summarise(Frequency = n()) %>%
+    ungroup() %>%
+    group_by(Cluster, Question) %>%
+    mutate(group_total = sum(Frequency)) %>%
+    group_by(Cluster, Question, Answers) %>%
+    mutate(Percentage = case_when(Cluster == name_cluster1 ~ Frequency/group_total * 100,
+                                  Cluster == name_cluster2 ~ Frequency/group_total * 100))  %>%
+    mutate(Percentage = round(Percentage, 2)) %>%
+    select(-Frequency, -group_total) %>%
+    pivot_wider(names_from = Cluster, values_from = Percentage) %>%
+    mutate_at(all_of(name_cluster1),  ~ifelse(is.na(.), 0, .)) %>%
+    mutate_at(all_of(name_cluster2),  ~ifelse(is.na(.), 0, .)) %>% 
+    ungroup()
+  difference <- abs(clusters[name_cluster1] - clusters[name_cluster2])
+  colnames(difference) <- "Difference"
+  difference <- difference$Difference
+  clusters <- clusters %>%
+    mutate(Difference = difference) %>%
+    rename("Question ID" = "Question") %>%
+    mutate(`Question ID` = as.numeric(`Question ID`)) %>%
+    inner_join(questions) %>%
+    select(`Question ID`, Question, everything()) %>%
+    arrange(desc(Difference))
+}
+
 # Extract Kendall's rank correlation tau test output
 kendall_output <- function(data){
   z = data$whole_matrix_correlations$shortest_vs_longest_distance_tag_tree$statistic
