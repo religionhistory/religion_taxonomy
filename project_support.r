@@ -719,6 +719,102 @@ id_metadata_dictionary <- function(data, raw_data, taxonomy) {
     select(label, everything())
 }
 
+# Extract list of clusters
+extract_clusters <- function(data) {
+  c1.1 = filter(data, Cluster == "1.1")
+  c1.2 = filter(data, Cluster == "1.2")
+  c2.1.1 = filter(data, Cluster == "2.1.1")
+  c2.1.2 = filter(data, Cluster == "2.1.2")
+  c2.2 = filter(data, Cluster == "2.2")
+  list = list(c1.1 = c1.1$ID, c1.2 = c1.2$ID, c2.1.1 = c2.1.1$ID, c2.1.2 = c2.1.2$ID, c2.2 = c2.2$ID)
+}
+
+# Extract tree edge lengths
+tree_edge_length <- function(data){
+  data <- data.frame(data$edge, edge_length=round(data$edge.length,2)) %>% 
+    rename("parent" = "X1", "node" = "X2")
+}
+
+# Plot tree with edge lengths
+plot_tree_edge <- function(tree, tree_edges){
+  tree <- ggtree(tree) %<+% tree_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2) 
+}
+
+# Plot raw overall tree for paper
+overall_tree_figure <- function(tree, clusters, dictionary){
+  edges <- tree_edge_length(tree)
+  # dictionary <- clusters %>% mutate(label = ID) %>% select(label, everything()) %>% select(-Cluster)
+  cluster_list <- extract_clusters(clusters)
+  cluster_tree <- groupOTU(tree, cluster_list, group_name = "Cluster")
+  tree_plot <- ggtree(cluster_tree, aes(color=Cluster)) +
+    scale_color_manual(breaks = c("elite", "religious_specialist", "non_elite"), values = c("black",  "#666666", "#999999", "#666666", "#999999", "#666666", "#E69F00", "#56B4E9", "#009E73")) 
+  tree_plot <- tree_plot %<+% 
+    edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2, color = "black") 
+  tree_plot <- tree_plot %<+% dictionary +
+    geom_tiplab(aes(label = `Entry name`), size=2.5, offset=0.05, color = "black") +
+    xlim(0, 1) +
+    geom_point(aes(x = x+0.02, color=elite, shape="17"), na.rm = TRUE, show.legend = TRUE)  + 
+    geom_point(aes(x = x+0.03, color=religious_specialist, shape="1"), na.rm = TRUE, show.legend = TRUE) +
+    geom_point(aes(x = x+0.04, color=non_elite, shape="15"), na.rm = TRUE, show.legend = TRUE) +
+    guides(shape = guide_legend(title="Group of People"), labels = c("Religious Specialist", "Non-elite", "Elite")) + 
+    geom_vline(xintercept = 0.355) +
+    guides(color = FALSE)
+}
+
+# Prune tree by cluster(s) of interest for figures
+prune_tree <- function(tree, id_dictionary, metadata, cluster, entry_name_offset, offset_1, offset_2, offset_3) {
+  # Combine dictionary with metadata
+  dictionary = id_metadata_dictionary(id_dictionary, raw_data, tree)
+  # Extract cluster of interest
+  cluster_dictionary = dictionary %>%
+    right_join(metadata) %>%
+    filter(Cluster %in% cluster) %>%
+    mutate(label = ID)
+  # Prune tree
+  prune_tree = keep.tip(tree, cluster_dictionary$label)
+  # Add edge lengths
+  tree_edges = tree_edge_length(prune_tree)
+  if(length(cluster) == 1) {
+    tree_plot = plot_tree_edge(prune_tree, tree_edges)
+    tree_plot = tree_plot %<+% dictionary +
+      geom_tiplab(aes(label = `Entry name`), size=2.5, offset=entry_name_offset, color = "black") +
+      xlim(0, 1) +
+      geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
+      geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
+      geom_point(aes(x = x+offset_3, shape=non_elite, color=non_elite), na.rm = TRUE) +
+      scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"), labels = c("Elite", "Non-elite", "Religious Specialist")) +
+      guides(shape = guide_legend(title="Group of People"), color = guide_legend(title="Group of People")) 
+  } else if(length(cluster) == 2) {
+    cluster_list <- extract_clusters(cluster_dictionary)
+    cluster_tree <- groupOTU(prune_tree, cluster_list, group_name = "Cluster")
+    tree_plot <- ggtree(cluster_tree, aes(color=Cluster)) +
+      scale_color_manual(breaks = c("elite", "religious_specialist", "non_elite"), values = c("black", "#666666", "#999999", "#E69F00", "#56B4E9", "#009E73")) 
+    tree_plot <- tree_plot %<+% 
+      tree_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2, color = "black") 
+    tree_plot = tree_plot %<+% dictionary +
+      geom_tiplab(aes(label = `Entry name`), size=2.5, offset=entry_name_offset, color = "black") +
+      xlim(0, 1) +
+      geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
+      geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
+      geom_point(aes(x = x+offset_3, shape=non_elite, color=non_elite), na.rm = TRUE) +
+      guides(shape = guide_legend(title="Group of People")) 
+  } else {
+    cluster_list <- extract_clusters(cluster_dictionary)
+    cluster_tree <- groupOTU(prune_tree, cluster_list, group_name = "Cluster")
+    tree_plot <- ggtree(cluster_tree, aes(color=Cluster)) +
+      scale_color_manual(breaks = c("elite", "religious_specialist", "non_elite"), values = c("black", "#666666", "#999999", "#666666", "#E69F00", "#56B4E9", "#009E73")) 
+    tree_plot <- tree_plot %<+% 
+      tree_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2, color = "black")
+    tree_plot = tree_plot %<+% dictionary +
+      geom_tiplab(aes(label = `Entry name`), size=2.5, offset=entry_name_offset, color = "black") +
+      xlim(0, 1) +
+      geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
+      geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
+      geom_point(aes(x = x+offset_3, shape=non_elite, color=non_elite), na.rm = TRUE) +
+      guides(shape = guide_legend(title="Group of People")) 
+  }
+}
+
 # Format data for heatmap visualisation
 heatmap_formatting <- function(data) {
   # Convert ID to row names
@@ -727,21 +823,10 @@ heatmap_formatting <- function(data) {
   data <- data %>% select(-ID)
 }
 
-# Extract taxonomy edge lengths
-taxonomy_edge_length <- function(data){
-  data <- data.frame(data$edge, edge_length=round(data$edge.length,2)) %>% 
-    rename("parent" = "X1", "node" = "X2")
-}
-
-# Plot taxonomy with edge lengths
-plot_taxonomy_edge <- function(taxonomy, taxonomy_edges){
-  tree <- ggtree(taxonomy) %<+% taxonomy_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2) 
-}
-
-# Plot taxonomy with entry/group of people labels
-plot_taxonomy_group <- function(taxonomy, taxonomy_edges, dictionary){
+# Plot tree with entry/group of people labels
+plot_tree_group <- function(tree, tree_edges, dictionary){
   # Add edge lengths
-  tree <- plot_taxonomy_edge(taxonomy, taxonomy_edges)
+  tree <- plot_tree_edge(tree, tree_edges)
   # Add tiplabels and circles indicating which group of people(s) entry covers
   tree2 <- tree %<+% dictionary +
     geom_tiplab(aes(label = `Entry name`), size=2.5, offset=0.255) +

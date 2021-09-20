@@ -11,7 +11,7 @@ make.dir("results")
 
 # Visualize phylogeny
 make.dir("./03_visualization/input")
-files <- c("./02_make_nexus/output/b_f_con_data_50_50.csv", "./02_make_nexus/output/b_f_con_ID_dict_50_50.csv", "./data/drh.csv", "./data/BEAST2/con/b_f_con_50_50_mcct.tree")
+files <- c( "./data/clusters/b_f_con_50_50.csv", "./02_make_nexus/output/b_f_con_data_50_50.csv", "./02_make_nexus/output/b_f_con_ID_dict_50_50.csv", "./data/drh.csv", "./data/BEAST2/con/b_f_con_50_50_mcct.tree")
 file.copy(files, "./03_visualization/input", overwrite = TRUE)
 setwd("./03_visualization/")
 source("visualization.r")
@@ -26,6 +26,8 @@ file.copy(files, "./04_tree_comparison/input", overwrite = TRUE)
 setwd("./04_tree_comparison/")
 source("tree_comparison.r")
 setwd("..")
+
+# Find 
 
 # Compare correlation within clusters
 make.dir("./06_cluster_correlation/input")
