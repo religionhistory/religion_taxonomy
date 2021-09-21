@@ -23,6 +23,11 @@ Comparison between the expert sourced tagging tree and the data dervived taxonom
   - [rlist version 0.4.6.1](https://cran.r-project.org/web/packages/rlist/index.html)
   - [ggtree version 2.99.0](https://bioconductor.org/packages/release/bioc/html/ggtree.html)
 
+Additional analysis was performed using the following packages:
+  - [MASS version 7.3-53](https://cran.r-project.org/web/packages/MASS/index.html)
+  - [factoextra version 1.0.7](https://cran.r-project.org/web/packages/factoextra/index.html)
+  - [ggfortify version 0.4.11](https://cran.r-project.org/web/packages/ggfortify/index.html)
+
 All required packaged will be automatically installed by running the analysis code. 
 
 ## Run Analysis 
