@@ -29,7 +29,7 @@ setwd("..")
 
 # Find questions that discriminate between clusters
 make.dir("./05_cluster_comparison/input")
-files <- c("./data/drh.csv", "./data/clusters/b_f_con_50_50.csv")
+files <- c("./data/drh.csv", "./data/clusters/b_f_con_50_50.csv", "./data/clusters/b_f_r4_50_50.csv")
 file.copy(files, "./05_cluster_comparison/input", overwrite = TRUE)
 setwd("./05_cluster_comparison/")
 source("cluster_comparison.r")
