@@ -37,20 +37,3 @@ box_plot <- ggplot(cluster_correlations, aes(x=Cluster, y=cor)) +
 cairo_pdf("../figures/within_cluster_correlation_box.pdf", height = 3.5, width = 3.5)
 plot(box_plot)
 dev.off()
-
-ggplot(cluster_correlations, aes(x=Cluster, y=cor)) +
-  geom_violin(width = 1) +
-  theme_bw() +
-  theme(
-    axis.text = element_text(colour = "black"),
-    axis.line.x = element_line(color="black", size = 0.5),
-    axis.line.y = element_line(color="black", size = 0.5),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.border = element_blank(),
-    panel.background = element_blank(),
-    legend.position="none") +
-  ylab("Correlation")
-ggsave("../figures/within_cluster_correlation_violin.pdf", width = 3.5, height = 3.5)
-
-
