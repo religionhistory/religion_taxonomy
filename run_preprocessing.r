@@ -3,6 +3,9 @@ rm(list = ls())
 # Load packages and functions
 source("./project_support.r")
 
+# Unzip data
+unzip("./data/drh.csv.zip", exdir = "./data")
+
 # Clean data
 make.dir("./01_clean_data/input")
 files <- c("./data/drh.csv", "./data/related_questions.csv", "./data/drh_v6_poll.csv")
