@@ -26,6 +26,21 @@ C2.1vC2.2 <- compare_clusters(metadata, cluster1 = c("2.1.1", "2.1.2"), cluster2
 # Cluster 2.1.1 vs Cluster 2.1.2 
 C2.1.1vC2.1.2 <- compare_clusters(metadata, cluster1 = "2.1.1", cluster2 = "2.1.2", name_cluster1 = "C2.1.1", name_cluster2 = "C2.1.2")
 
+test <- C1vC2 %>%
+  group_by(`Question ID`) %>%
+  mutate(max_diff = max(Difference)) %>%
+  filter(max_diff >= 55)
+
+
+test <- C1.1vC1.2 %>%
+  group_by(`Question ID`) %>%
+  mutate(max_diff = max(Difference)) %>%
+  filter(max_diff >= 50)
+
+test <- C2.1vC2.2 %>%
+  group_by(`Question ID`) %>%
+  mutate(max_diff = max(Difference)) %>%
+  filter(max_diff >= 50)
 
 # By sub-cluster
 # Cluster 2.1 vs. C1 & C2.2
