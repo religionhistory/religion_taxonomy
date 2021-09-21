@@ -4,6 +4,10 @@ rm(list = ls())
 
 source("../project_support.r")
 
+# Check if additional libraries are installed and if they are not installed, install them
+packages <- c("MASS", "factoextra", "ggfortify")
+install.packages(setdiff(packages, rownames(installed.packages())))
+
 # Load additional libraries
 # This will break a lot of the code which relies on dplyr::select
 # so run this code separately to the main analysis
