@@ -25,7 +25,7 @@ dev.off()
 # Plot tree of just cluster 1 (C1.1 and C1.2)
 C1 <- prune_tree(tree, id_dictionary, metadata = clusters, cluster = c("1.1", "1.2"), entry_name_offset = 0.05, offset_1 = 0.02, offset_2 = 0.03, offset_3 = 0.04)
 # Save figure
-cairo_pdf("../figures/cluster_1_figure.pdf", height = 11, width = 13)
+cairo_pdf("../figures/cluster_1_figure.pdf", height = 16, width = 13)
 plot(C1) 
 dev.off()
 

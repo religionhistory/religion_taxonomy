@@ -777,41 +777,44 @@ prune_tree <- function(tree, id_dictionary, metadata, cluster, entry_name_offset
   if(length(cluster) == 1) {
     tree_plot = plot_tree_edge(prune_tree, tree_edges)
     tree_plot = tree_plot %<+% dictionary +
-      geom_tiplab(aes(label = `Entry name`), size=3, offset=entry_name_offset, color = "black") +
+      geom_tiplab(aes(label = `Entry name`), size=4.5, offset=entry_name_offset, color = "black") +
       xlim(0, 1) +
       geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
       geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
       geom_point(aes(x = x+offset_3, shape=non_elite, color=non_elite), na.rm = TRUE) +
       scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"), labels = c("Elite", "Non-elite", "Religious Specialist")) +
-      guides(shape = guide_legend(title="Group of People"), color = guide_legend(title="Group of People")) 
+      guides(shape = guide_legend(title="Group of People"), color = guide_legend(title="Group of People"))  +
+      theme(legend.text=element_text(size=11), legend.title=element_text(size=12))
   } else if(length(cluster) == 2) {
     cluster_list <- extract_clusters(cluster_dictionary)
     cluster_tree <- groupOTU(prune_tree, cluster_list, group_name = "Cluster")
     tree_plot <- ggtree(cluster_tree, aes(color=Cluster)) +
       scale_color_manual(breaks = c("elite", "religious_specialist", "non_elite"), values = c("black", "#666666", "#999999", "#E69F00", "#56B4E9", "#009E73")) 
     tree_plot <- tree_plot %<+% 
-      tree_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2, color = "black") 
+      tree_edges + geom_text(aes(x = branch, label = edge_length), size = 3, hjust = -.2, vjust=-.2, color = "black") 
     tree_plot = tree_plot %<+% dictionary +
-      geom_tiplab(aes(label = `Entry name`), size=3, offset=entry_name_offset, color = "black") +
+      geom_tiplab(aes(label = `Entry name`), size=4.5, offset=entry_name_offset, color = "black") +
       xlim(0, 1) +
       geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
       geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
       geom_point(aes(x = x+offset_3, shape=non_elite, color=non_elite), na.rm = TRUE) +
-      guides(shape = guide_legend(title="Group of People")) 
+      guides(shape = guide_legend(title="Group of People")) +
+      theme(legend.text=element_text(size=11), legend.title=element_text(size=12))
   } else {
     cluster_list <- extract_clusters(cluster_dictionary)
     cluster_tree <- groupOTU(prune_tree, cluster_list, group_name = "Cluster")
     tree_plot <- ggtree(cluster_tree, aes(color=Cluster)) +
       scale_color_manual(breaks = c("elite", "religious_specialist", "non_elite"), values = c("black", "#666666", "#999999", "#666666", "#E69F00", "#56B4E9", "#009E73")) 
     tree_plot <- tree_plot %<+% 
-      tree_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2, color = "black")
+      tree_edges + geom_text(aes(x = branch, label = edge_length), size = 3, hjust = -.2, vjust=-.2, color = "black")
     tree_plot = tree_plot %<+% dictionary +
-      geom_tiplab(aes(label = `Entry name`), size=3, offset=entry_name_offset, color = "black") +
+      geom_tiplab(aes(label = `Entry name`), size=4.5, offset=entry_name_offset, color = "black") +
       xlim(0, 1) +
       geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
       geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
       geom_point(aes(x = x+offset_3, shape=non_elite, color=non_elite), na.rm = TRUE) +
-      guides(shape = guide_legend(title="Group of People")) 
+      guides(shape = guide_legend(title="Group of People"))  +
+      theme(legend.text=element_text(size=11), legend.title=element_text(size=12))
   }
 }
 
