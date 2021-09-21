@@ -34,7 +34,7 @@ box_plot <- ggplot(cluster_correlations, aes(x=Cluster, y=cor)) +
     panel.background = element_blank(),
     legend.position="none") +
   ylab("Correlation") 
-cairo_pdf("../figures/additional/historian/within_cluster_correlation_box.pdf", height = 3.5, width = 3.5)
+cairo_pdf("../figures/within_cluster_correlation_box.pdf", height = 3.5, width = 3.5)
 plot(box_plot)
 dev.off()
 
@@ -51,6 +51,6 @@ ggplot(cluster_correlations, aes(x=Cluster, y=cor)) +
     panel.background = element_blank(),
     legend.position="none") +
   ylab("Correlation")
-ggsave("../figures/additional/historian/within_cluster_correlation_violin.pdf", width = 3.5, height = 3.5)
+ggsave("../figures/within_cluster_correlation_violin.pdf", width = 3.5, height = 3.5)
 
 
