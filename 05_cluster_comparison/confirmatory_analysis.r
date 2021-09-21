@@ -4,10 +4,12 @@ rm(list = ls())
 
 source("../project_support.r")
 
-# Load additional library
+# Load additional libraries
 # This will break a lot of the code which relies on dplyr::select
 # so run this code separately to the main analysis
 library(MASS)
+library(factoextra)
+library(ggfortify)
 
 # Load additional functions
 
@@ -66,6 +68,41 @@ step_model <- stepwise_regression(data = data, cluster1 = c("1.1", "1.2"), clust
 # Extract used questions
 used_questions <- extract_questions(step_model, questions)
 
+# Remove metadata
+data_sub <- data %>%     
+  dplyr::select(-ID, -`Entry ID`, -`Branching question`, -`Entry name`, -`Entry source`, -`Entry description`, -`Entry tags`, -Expert, -`Region ID`, -`Region name`, -`Region description`, -`Region tags`, -label, -elite, -non_elite, -religious_specialist) 
+data_sub[data_sub == "{01}"] <- "3"
+data_sub <- data_sub %>% 
+  mutate(Cluster = as.factor(Cluster)) %>%
+  mutate_if(is.character, as.numeric)
+
+# Perform PCA
+pca <- prcomp(dplyr::select(data_sub, -Cluster))
+
+# Plot PCA
+autoplot(pca, data = data_sub, colour = 'Cluster') +
+  theme_minimal() +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2"))
+
+# Visualize variables
+fviz_pca_var(pca, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07")
+)
+
+# Extract the results for variables
+pca_var <- get_pca_var(pca)
+
+# Select variables that are most contributing to PC1 and PC2
+pc1 <- tibble(`Question ID` = names(pca_var$contrib[,1]), contrib = pca_var$contrib[,1]) %>%
+  mutate(`Question ID` = as.numeric(`Question ID`)) %>%
+  left_join(questions) %>%
+  filter(contrib > 1) %>%
+  arrange(desc(contrib))
+pc2 <- tibble(`Question ID` = names(pca_var$contrib[,2]), contrib = pca_var$contrib[,2]) %>%
+  mutate(`Question ID` = as.numeric(`Question ID`)) %>%
+  left_join(questions) %>%
+  filter(contrib > 1) %>%
+  arrange(desc(contrib))
 
 
 
