@@ -773,11 +773,11 @@ prune_tree <- function(tree, id_dictionary, metadata, cluster, entry_name_offset
   # Prune tree
   prune_tree = keep.tip(tree, cluster_dictionary$label)
   # Add edge lengths
-  tree_edges = tree_edge_length(prune_tree)
+  tree_edges <- tree_edge_length(prune_tree)
   if(length(cluster) == 1) {
     tree_plot = plot_tree_edge(prune_tree, tree_edges)
     tree_plot = tree_plot %<+% dictionary +
-      geom_tiplab(aes(label = `Entry name`), size=2.5, offset=entry_name_offset, color = "black") +
+      geom_tiplab(aes(label = `Entry name`), size=3, offset=entry_name_offset, color = "black") +
       xlim(0, 1) +
       geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
       geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
@@ -792,7 +792,7 @@ prune_tree <- function(tree, id_dictionary, metadata, cluster, entry_name_offset
     tree_plot <- tree_plot %<+% 
       tree_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2, color = "black") 
     tree_plot = tree_plot %<+% dictionary +
-      geom_tiplab(aes(label = `Entry name`), size=2.5, offset=entry_name_offset, color = "black") +
+      geom_tiplab(aes(label = `Entry name`), size=3, offset=entry_name_offset, color = "black") +
       xlim(0, 1) +
       geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
       geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
@@ -806,7 +806,7 @@ prune_tree <- function(tree, id_dictionary, metadata, cluster, entry_name_offset
     tree_plot <- tree_plot %<+% 
       tree_edges + geom_text(aes(x = branch, label = edge_length), size = 2, hjust = -.2, vjust=-.2, color = "black")
     tree_plot = tree_plot %<+% dictionary +
-      geom_tiplab(aes(label = `Entry name`), size=2.5, offset=entry_name_offset, color = "black") +
+      geom_tiplab(aes(label = `Entry name`), size=3, offset=entry_name_offset, color = "black") +
       xlim(0, 1) +
       geom_point(aes(x = x+offset_1, shape=elite, color=elite), na.rm = TRUE)  + 
       geom_point(aes(x = x+offset_2, shape=religious_specialist, color=religious_specialist), na.rm = TRUE) +
