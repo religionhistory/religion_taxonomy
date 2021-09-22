@@ -8,12 +8,12 @@ source("../project_support.r")
 correlations <- readRDS("./input/b_f_con_50_50_cor.rds")
 clusters <- read_csv("./input/b_f_con_50_50.csv")
 
-# Find the overall correlation between each comparison method
+# Find the overall correlation for each comparison method
 overall_correlations <- kendall_output(correlations) 
 # Save results
 write_csv(overall_correlations, "../results/overall_correlations.csv")
 
-# Find the correlation between clusters by branch length vs. shortest tagging tree
+# Find the correlation within clusters by branch length vs. shortest tagging tree
 # This comparison method was chosen as it has the strongest correlation
 cluster_correlations <- cluster_cor(correlations, clusters, "branch_length_short_tag_tree")
 
