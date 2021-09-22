@@ -1,4 +1,4 @@
-# Make output for historians
+# Find discriminating questions between clusters
 
 rm(list = ls())
 
