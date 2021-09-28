@@ -1,11 +1,11 @@
 # Check if packages are installed and if they are not installed, install them
 packages <- c("devtools","tidyverse", "data.table", "ape", "igraph", "adephylo", "h2o", "rlist")
 cran_packages <- setdiff(packages, rownames(installed.packages()))
-require(devtools)
 if( length(cran_packages) ) {
   if( length(grep("devtools", cran_packages))) {
     install.packages("devtools")
   }
+  require(devtools)
   if( length(grep("tidyverse", cran_packages))) {
     install_version("tidyverse", version = "1.3.0", repos = "http://cran.us.r-project.org")
   }
