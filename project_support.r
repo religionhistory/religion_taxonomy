@@ -1,12 +1,39 @@
 # Check if packages are installed and if they are not installed, install them
-packages <- c("tidyverse", "data.table", "ape", "igraph", "adephylo", "h2o", "rlist")
-install.packages(setdiff(packages, rownames(installed.packages())))
+packages <- c("devtools","tidyverse", "data.table", "ape", "igraph", "adephylo", "h2o", "rlist")
+cran_packages <- setdiff(packages, rownames(installed.packages()))
+require(devtools)
+if( length(cran_packages) ) {
+  if( length(grep("devtools", cran_packages))) {
+    install.packages("devtools")
+  }
+  if( length(grep("tidyverse", cran_packages))) {
+    install_version("tidyverse", version = "1.3.0", repos = "http://cran.us.r-project.org")
+  }
+  if( length(grep("data.table", cran_packages))) {
+    install_version("data.table", version = "1.12.8", repos = "http://cran.us.r-project.org")
+  }
+  if( length(grep("h2o", cran_packages))) {
+    install_version("h2o", version = "3.30.0.1", repos = "http://cran.us.r-project.org")
+  }
+  if( length(grep("ape", cran_packages))) {
+    install_version("ape", version = "5.4", repos = "http://cran.us.r-project.org")
+  }
+  if( length(grep("igraph", cran_packages))) {
+    install_version("igraph", version = "2.24.0", repos = "http://cran.us.r-project.org")
+  }
+  if( length(grep("adephylo", cran_packages))) {
+    install_version("adephylo", version = "1.1-11", repos = "http://cran.us.r-project.org")
+  }
+  if( length(grep("rlist", cran_packages))) {
+    install_version("rlist", version = "0.4.6.1", repos = "http://cran.us.r-project.org")
+  }
+}
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 bioc_packages <- "ggtree"
 bioc_missing <- setdiff("ggtree", rownames(installed.packages())) 
 if( length(bioc_missing) ) {
-  biocLite(bioc_packages[bioc_missing])
+  BiocManager::install("ggtree", version = "2.99.0")
 }
 
 # Load packages
