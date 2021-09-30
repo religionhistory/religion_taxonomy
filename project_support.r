@@ -46,6 +46,8 @@ library(ggtree)
 library(h2o)
 library(rlist)
 
+rm(list = ls())
+
 # Functions
 
 # Create a new directory or delete and replace an existing directory
@@ -1132,6 +1134,36 @@ compare_clusters <- function(data, cluster1, cluster2, name_cluster1, name_clust
   difference <- difference$Difference
   clusters <- clusters %>%
     mutate(Difference = difference) %>%
+    rename("Question ID" = "Question") %>%
+    mutate(`Question ID` = as.numeric(`Question ID`)) %>%
+    inner_join(questions) %>%
+    select(`Question ID`, Question, everything()) %>%
+    arrange(desc(Difference))
+}
+
+# Find distinguishing questions between entries
+compare_entries <- function(data, entries) {
+  entries <- metadata %>% 
+    mutate(Group = ifelse(ID %in% entries, 1, 0)) %>%
+    filter(!is.na(Group)) %>%
+    select(-Cluster, -ID, -`Entry ID`, -`Branching question`, -`Entry name`, -`Entry source`, -`Entry description`, -`Entry tags`, -Expert, -`Region ID`, -`Region name`, -`Region description`, -`Region tags`, -elite, -non_elite, -religious_specialist) %>%
+    mutate_all(as.character) %>%
+    pivot_longer(c(-Group), names_to = "Question", values_to = "Answers") %>%
+    group_by(Group, Question, Answers) %>%
+    summarise(Frequency = n()) %>%
+    ungroup() %>%
+    group_by(Group, Question) %>%
+    mutate(group_total = sum(Frequency)) %>%
+    group_by(Group, Question, Answers) %>%
+    mutate(Percentage = case_when(Group == 1 ~ Frequency/group_total * 100,
+                                  Group == 0 ~ Frequency/group_total * 100)) %>%
+    mutate(Percentage = round(Percentage, 2)) %>%
+    select(-Frequency, -group_total) %>%
+    pivot_wider(names_from = Group, values_from = Percentage) %>%
+    rename("Group" = "1", "Other" = "0") %>% 
+    mutate(Group = ifelse(is.na(Group), 0, Group)) %>%
+    mutate(Other = ifelse(is.na(Other), 0, Other)) %>%
+    mutate(Difference = abs(Group - Other)) %>%
     rename("Question ID" = "Question") %>%
     mutate(`Question ID` = as.numeric(`Question ID`)) %>%
     inner_join(questions) %>%

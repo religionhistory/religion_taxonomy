@@ -35,3 +35,10 @@ write_csv(C1.1vC1.2, "./output/c1.1vc1.2.csv")
 write_csv(C2.1vC2.2, "./output/c2.1vc2.2.csv")
 write_csv(C2.1.1vC2.1.2, "./output/c2.1.1vc2.1.2.csv")
 
+# Find distinguishing questions between entries
+# Haroi (752_NR), Raglai - Viatemese Religions (727_N) and Cham Bani (476_ENR)
+entry_hrc <- compare_entries(metadata, c("752_NR", "727_N", "476_ENR"))
+
+# Save output
+write_csv(entry_hrc, "./output/haroi_reglai_cham.csv")
+
