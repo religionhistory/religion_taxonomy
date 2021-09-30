@@ -786,7 +786,6 @@ overall_tree_figure <- function(tree, clusters, dictionary){
     geom_point(aes(x = x+0.03, color=religious_specialist, shape="1"), na.rm = TRUE, show.legend = TRUE) +
     geom_point(aes(x = x+0.04, color=non_elite, shape="15"), na.rm = TRUE, show.legend = TRUE) +
     guides(shape = guide_legend(title="Group of People"), labels = c("Religious Specialist", "Non-elite", "Elite")) + 
-    geom_vline(xintercept = 0.355) +
     guides(color = FALSE)
 }
 
